@@ -1,0 +1,18 @@
+
+it's a tetris clone, made for linux terminal, 
+
+it's programmed in C langage.
+
+It's very basic.
+
+few ncurses bugs stays when resizing the terminal.
+
+install ncurses hearder files and run
+
+make
+
+then run 
+
+./Tetris
+
+and enjoy
