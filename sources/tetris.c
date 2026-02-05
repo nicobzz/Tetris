@@ -70,21 +70,19 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 
 	termData->prevLINES = LINES;
 	termData->prevCOLS = COLS;
-	termData->firstDisplay = 1;
 	termData->termTropPetit = 0;
 	termData->tetrisWin = NULL;
 	termData->scoreWin = NULL;
 
 //Créer les fenetre ncurses
 	posYTWin = (LINES - (TETRIS_HEIGHT + 2))/2 ;
-	posXTWin = (COLS - (TETRIS_WIDTH + 2))/2 ;
-	refresh();
-	termData->tetrisWin = subwin(stdscr,TETRIS_HEIGHT+2 ,TETRIS_WIDTH +2 , posYTWin, posXTWin);
+	posXTWin = (COLS - (TETRIS_WIDTH * 2 + 2))/2 ;
+	termData->tetrisWin = subwin(stdscr,TETRIS_HEIGHT+2 ,TETRIS_WIDTH * 2 + 2 , posYTWin, posXTWin);
 	box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
 	wrefresh(termData->tetrisWin);
 
 	posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
-	posXSWin = (posXTWin ) - ( TETRIS_SCORE_WIDTH  + 10);
+	posXSWin = (posXTWin ) - (( TETRIS_SCORE_WIDTH *2+2)  + 10);
 	termData->scoreWin = subwin(stdscr, TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH, posYSWin, posXSWin);
 	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
 	wrefresh(termData->scoreWin);

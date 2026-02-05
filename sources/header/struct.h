@@ -52,7 +52,6 @@ struct Monde {
 struct TermData {
 	int prevLINES;
 	int prevCOLS;
-	int firstDisplay;
 	int termTropPetit;
 	WINDOW *tetrisWin;
 	WINDOW *scoreWin;
