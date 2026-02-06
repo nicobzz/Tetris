@@ -40,7 +40,7 @@ void clear_term ( struct TermData * termData){
 }
 
 void tetris_init_data( struct Monde *monde, struct TermData *termData){
-	int posXTWin, posYTWin, posXSWin, posYSWin, i, j;
+	int i, j;
 
 //ouvre le fichier /dev/random pour avoir des piece random
 	monde->random = open("/dev/random", O_RDONLY);
@@ -75,17 +75,7 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 	termData->scoreWin = NULL;
 
 //Créer les fenetre ncurses
-	posYTWin = (LINES - (TETRIS_HEIGHT + 2))/2 ;
-	posXTWin = (COLS - (TETRIS_WIDTH * 2 + 2))/2 ;
-	termData->tetrisWin = subwin(stdscr,TETRIS_HEIGHT+2 ,TETRIS_WIDTH * 2 + 2 , posYTWin, posXTWin);
-	box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
-	wrefresh(termData->tetrisWin);
-
-	posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
-	posXSWin = (posXTWin ) - (( TETRIS_SCORE_WIDTH *2+2)  + 10);
-	termData->scoreWin = subwin(stdscr, TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH, posYSWin, posXSWin);
-	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
-	wrefresh(termData->scoreWin);
+	tetris_creer_fenetre(termData, 1);
 
 //initiatise les couleurs
 	init_color( COLOR_PINK, 976, 375, 554);
@@ -102,6 +92,65 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 
 }
 
+int tetris_creer_fenetre( struct TermData *termData, int init){
+	int tropPetit = 0, posYSWin,  posXSWin, posYTWin, posXTWin;
+//Créer ou repositionne les fenetre ncurses
+	posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
+	posXSWin = (COLS - (TETRIS_REAL_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_WIDTH))/2 ;
+	
+	posYTWin = (LINES - (TETRIS_REAL_HEIGHT ))/2 ;
+	posXTWin = posXSWin + TETRIS_SCORE_WIDTH + TETRIS_SPACE_BETWEEN ; 
+	
+	if(posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + TETRIS_REAL_WIDTH > COLS || posYTWin + TETRIS_REAL_HEIGHT > LINES){
+// si les fenetre n'ont pas la bonne taille on les mete de taille 1
+		tropPetit = 1;
+		if (init){
+//si on est dans la fonction init on crée les fenetre
+			termData->tetrisWin = subwin(stdscr, 0, 0, 1, 1);
+			termData->scoreWin = subwin(stdscr, 0, 0, 1, 1);
+		}else{
+//sinon on les redimensionne
+			werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			mvwin( termData->tetrisWin , 0, 0);
+			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			wresize( termData->tetrisWin , 1, 1);
+			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			
+			werase(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+			mvwin( termData->scoreWin , 0, 0);
+			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+			wresize( termData->scoreWin , 1, 1);
+			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+		}
+	}else{
+		if (init){
+			termData->tetrisWin = subwin(stdscr, TETRIS_REAL_HEIGHT ,TETRIS_REAL_WIDTH , posYTWin, posXTWin);
+			termData->scoreWin = subwin(stdscr, TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH, posYSWin, posXSWin);
+		}else{
+			werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			mvwin( termData->tetrisWin , posYTWin, posXTWin);
+			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			wresize( termData->tetrisWin , TETRIS_REAL_HEIGHT , TETRIS_REAL_WIDTH );
+			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+			
+			werase(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+			mvwin( termData->scoreWin , posYSWin, posXSWin);
+			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+			wresize( termData->scoreWin , TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH);
+			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+		}
+	}
+
+	box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
+	wrefresh(termData->tetrisWin);
+	wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+
+	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
+	wrefresh(termData->scoreWin);
+	if( ! tropPetit)
+		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
+	return tropPetit;
+}
 
 void tetris_main_loop( struct Monde *monde, struct TermData *termData){
 	while (1){

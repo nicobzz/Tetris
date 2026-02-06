@@ -10,8 +10,7 @@
 
 
 void tetris_display( struct Monde *monde, struct TermData *termData){
-	int posXTWin, posYTWin, i, j;
-
+	int i, j, tropPetit;
 
 	if (monde->startMenu){
 // Si on est dans StartMenu
@@ -19,29 +18,22 @@ void tetris_display( struct Monde *monde, struct TermData *termData){
 	//si il y a redimensionnement du terminal on redessine tout
 			RESIZE_SAVE;
 			monde->firstDraw = 0;
-			posYTWin = (LINES - (TETRIS_HEIGHT + 2))/2 ;
-			posXTWin = (COLS - (TETRIS_WIDTH * 2 + 2))/2 ;
-			if ((TETRIS_HEIGHT + 2 > LINES) || (TETRIS_WIDTH *2 + 2) > COLS){
+			tropPetit = tetris_creer_fenetre( termData, 0);
+			if (tropPetit){
 	// si le terminal est trop petit
+				//redessine les fenetre 
 				termData->termTropPetit = 1;
+				mvprintw ( 5,0, "error, too small terminal");
+				refresh();
 			}else{
 				termData->termTropPetit = 0;
-
-				werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
+				//redessine les fenetre 
+				tetris_creer_fenetre( termData, 0);
 				
-				//redessine la fenetre principale
-				mvwin( termData->tetrisWin , posYTWin, posXTWin);
-				wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-				wresize( termData->tetrisWin , TETRIS_HEIGHT + 2, TETRIS_WIDTH *2 + 2);
-				wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-				box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
-				wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-				
-				wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
 				for (i=0; i < TETRIS_WIDTH; i++){
 					for (j=0 ; j< TETRIS_HEIGHT; j++){
 						mvwprintw( termData->tetrisWin , j+1 , i*2+1 , "  ");
-						mvwprintw( termData->tetrisWin , TETRIS_HEIGHT / 2, (TETRIS_WIDTH * 2 - 10)/ 2 + 1, "push ENTER");
+						mvwprintw( termData->tetrisWin , TETRIS_HEIGHT / 2, (TETRIS_WIDTH * 2 - 11)/ 2 + 1, "press ENTER");
 					}	
 				}
 				wrefresh(termData->tetrisWin);
@@ -58,24 +50,16 @@ void tetris_display( struct Monde *monde, struct TermData *termData){
 	//si il y a redimensionnement du terminal on redessine tout
 			RESIZE_SAVE;
 			monde->firstDraw = 0;
-			posYTWin = (LINES - (TETRIS_HEIGHT + 2))/2 ;
-			posXTWin = (COLS - (TETRIS_WIDTH * 2 + 2))/2 ;
-			if ((TETRIS_HEIGHT + 2 > LINES) || (TETRIS_WIDTH * 2 + 2) > COLS){
+			tropPetit = tetris_creer_fenetre( termData, 0);
+			if (tropPetit){
 	// si le terminal est trop petit
 				termData->termTropPetit = 1;
-				mvprintw ( 5,0, "erreur terminal trop petit");
+				mvprintw ( 5,0, "error, too small terminal");
 				refresh();
 			}else{
 				termData->termTropPetit = 0;
-				werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-
-				mvwin( termData->tetrisWin , posYTWin, posXTWin);
-				wresize( termData->tetrisWin , TETRIS_HEIGHT + 2, TETRIS_WIDTH * 2 + 2);
-				box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
-				
-				wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-	
-				wrefresh(termData->tetrisWin);
+				//redessine les fenetre 
+				tetris_creer_fenetre( termData, 0);
 				tetris_redessine_plan(monde, termData);
 				
 //redessinne la fenetre des scores
@@ -114,14 +98,7 @@ void tetris_redessine_plan(struct Monde *monde,struct TermData *termData){
 void tetris_dessine_score(struct Monde *monde,struct TermData *termData){
 
 //redessinne la fenetre des scores
-	int i, j ,c, c1, posYSWin, posXSWin, posXTWin;
-	posXTWin = (COLS - (TETRIS_WIDTH * 2 + 2))/2 ;
-	posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
-	posXSWin = (posXTWin ) - (( TETRIS_SCORE_WIDTH * 2 + 2) + 10);
-	mvwin( termData->scoreWin , posYSWin, posXSWin);
-	wresize( termData->scoreWin , TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH);
-	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
-	wrefresh(termData->scoreWin);
+	int i, j ,c, c1 ;
 	mvwprintw ( termData->scoreWin, 2, 2, "Level: %d   ",monde->niveau + 1);
 	mvwprintw ( termData->scoreWin, 3, 2, "Lines: %d   ",monde->lines);
 	if (! monde->startMenu){	
@@ -157,7 +134,6 @@ void tetris_dessine_score(struct Monde *monde,struct TermData *termData){
 		}
 	}
 
-	mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
 	mvwprintw( termData->scoreWin, 11, 19, " ");
 	wrefresh(termData->scoreWin);
 }
