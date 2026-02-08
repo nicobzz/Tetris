@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ncurses.h>
+#include <locale.h>
+#include <ncursesw/ncurses.h>
 
 #include "header/struct.h"
 #include "header/functionsdefs.h"
@@ -98,7 +99,7 @@ void tetris_redessine_plan(struct Monde *monde,struct TermData *termData){
 void tetris_dessine_score(struct Monde *monde,struct TermData *termData){
 
 //redessinne la fenetre des scores
-	int i, j ,c, c1 ;
+	int i, j, c ;
 	mvwprintw ( termData->scoreWin, 2, 2, "Level: %d   ",monde->niveau + 1);
 	mvwprintw ( termData->scoreWin, 3, 2, "Lines: %d   ",monde->lines);
 	if (! monde->startMenu){	
@@ -117,16 +118,13 @@ void tetris_dessine_score(struct Monde *monde,struct TermData *termData){
 			for (i=0; i<4; i++){
 				for (j=0; j<4; j++){
 					c = pieces[monde->prochainePiece][0][i][j];
-					c1 = c?c:' ';
 					if (c){
 						wattron(termData->scoreWin,COLOR_PAIR( monde->prochainePiece + 1));
+						mvwprintw( termData->scoreWin, 6+j , 8+i*2, "  ");
+						wattroff(termData->scoreWin,COLOR_PAIR( monde->prochainePiece + 1));
 					}else{ 
 						wattron(termData->scoreWin,COLOR_PAIR( DEFAULT_COLOR_PAIR));
-					}
-					mvwprintw( termData->scoreWin, 6+j , 8+i*2, "%c%c", c1, c1);
-					if (c){
-						wattroff(termData->scoreWin,COLOR_PAIR( monde->prochainePiece + 1));
-					}else{
+						mvwprintw( termData->scoreWin, 6+j , 8+i*2, "  ");
 						wattroff(termData->scoreWin,COLOR_PAIR( DEFAULT_COLOR_PAIR));
 					}
 				}

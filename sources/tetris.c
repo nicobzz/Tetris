@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <unistd.h> //pour sleep, a retirer apres debugage
 #include <string.h> //utile pour memcpy pour copier la struction PosPiece
-#include <ncurses.h>
+#include <locale.h>
+#include <ncursesw/ncurses.h>
 #include <time.h>
 #include <fcntl.h> //pour open et read pour le fichier /dev/random
 
@@ -12,6 +13,7 @@
 int main (int argc, char ** argv){
 	struct Monde monde;
 	struct TermData termData;
+	setlocale(LC_ALL, "");
 	initscr();              // Initialise la structure WINDOW et autres paramètres
 	cbreak();
 	keypad(stdscr, TRUE);	// permet de lire les entrées claviers spéciales en une fois( et non trois caractère pour les touches des flèches
@@ -81,13 +83,13 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 	init_color( COLOR_PINK, 976, 375, 554);
 	init_color( COLOR_BROWN, 340, 230, 220 );
 
-	init_pair(1, COLOR_GREEN, COLOR_GREEN);
-	init_pair(2, COLOR_YELLOW, COLOR_YELLOW);
-	init_pair(3, COLOR_BLUE, COLOR_BLUE);
-	init_pair(4, COLOR_MAGENTA, COLOR_MAGENTA);
-	init_pair(5, COLOR_CYAN, COLOR_CYAN);
-	init_pair(6, COLOR_PINK, COLOR_PINK);
-	init_pair(7, COLOR_BROWN, COLOR_BROWN);
+	init_pair(1, COLOR_WHITE, COLOR_WHITE);
+	init_pair(2, COLOR_WHITE, COLOR_GREEN);
+	init_pair(3, COLOR_WHITE, COLOR_BLUE);
+	init_pair(4, COLOR_WHITE, COLOR_MAGENTA);
+	init_pair(5, COLOR_WHITE, COLOR_CYAN);
+	init_pair(6, COLOR_WHITE, COLOR_PINK);
+	init_pair(7, COLOR_WHITE, COLOR_BROWN);
 	init_pair(DEFAULT_COLOR_PAIR, COLOR_WHITE, COLOR_BLACK);
 
 }

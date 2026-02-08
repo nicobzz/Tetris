@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h> //pour sleep, a retirer apres debugage
 #include <string.h> //utile pour memcpy pour copier la struction PosPiece
-#include <ncurses.h>
+#include <locale.h>
+#include <ncursesw/ncurses.h>
 #include <time.h>
 
 #include "header/struct.h"
