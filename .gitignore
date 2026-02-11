@@ -1,1 +1,7 @@
 Tetris
+./sources/change_monde.o
+./sources/display.o
+./sources/niveaux.o
+./sources/pieces.o
+./sources/random.o
+./sources/tetris.o

@@ -44,10 +44,8 @@ void clear_term ( struct TermData * termData){
 void tetris_init_monde_data( struct Monde *monde){
 	int i, j;
 //initialise le monde
-	monde->startMenu = 1;
-	monde->perdu = 0;
-	monde->quit = 0;
-	monde->pause = 0;
+	
+	monde->etat = TETRIS_START_MENU;
 	monde->time = 0;
 	for (i = 0; i<TETRIS_WIDTH; i++){
 		for( j = 0; j<TETRIS_HEIGHT; j++){
@@ -67,14 +65,13 @@ void tetris_init_monde_data( struct Monde *monde){
 	monde->lines = 0;
 	monde->firstDraw = 1;
 
-
 }
 
 void tetris_init_data( struct Monde *monde, struct TermData *termData){
 //ouvre le fichier /dev/random pour avoir des piece random
-	monde->random = open("/dev/random", O_RDONLY);
+	monde->random = open("/dev/urandom", O_RDONLY);
 
-	tetris_init_monde_data( monde);
+	tetris_init_monde_data(monde);
 
 	termData->prevLINES = LINES;
 	termData->prevCOLS = COLS;
@@ -168,7 +165,7 @@ void tetris_main_loop( struct Monde *monde, struct TermData *termData){
 		tetris_display( monde, termData );
 		tetris_millisec_sleep();
 		tetris_change_monde ( monde );
-		if (monde->quit) break;
+		if (monde->etat == TETRIS_QUIT) break;
 	}
 }
 

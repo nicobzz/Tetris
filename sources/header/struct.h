@@ -23,7 +23,11 @@
 #define TETRIS_PRIS 1
 #define TETRIS_WALL 2
 
-
+#define TETRIS_START_MENU 0
+#define TETRIS_PAUSE 1
+#define TETRIS_PERDU 2
+#define TETRIS_GAME 3
+#define TETRIS_QUIT 4
 
 #define COLOR_PINK 8
 #define COLOR_BROWN 9
@@ -39,10 +43,8 @@ struct PosPiece {
 
 struct Monde {
 	int time;
-	int startMenu;
+	int etat;
 	int score;
-	int perdu;
-	int pause;
 	int quit;
 	int plan[TETRIS_WIDTH][TETRIS_HEIGHT];	//le plan ou les pieces sont mises
 	int planColor[TETRIS_WIDTH][TETRIS_HEIGHT];	//le plan ou les couleurs sont mises
