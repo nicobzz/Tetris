@@ -41,14 +41,13 @@ void clear_term ( struct TermData * termData){
 	endwin();               // Restaure les paramètres par défaut du terminal
 }
 
-void tetris_init_data( struct Monde *monde, struct TermData *termData){
+void tetris_init_monde_data( struct Monde *monde){
 	int i, j;
-
-//ouvre le fichier /dev/random pour avoir des piece random
-	monde->random = open("/dev/random", O_RDONLY);
-
 //initialise le monde
 	monde->startMenu = 1;
+	monde->perdu = 0;
+	monde->quit = 0;
+	monde->pause = 0;
 	monde->time = 0;
 	for (i = 0; i<TETRIS_WIDTH; i++){
 		for( j = 0; j<TETRIS_HEIGHT; j++){
@@ -66,16 +65,22 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 	monde->prochainePiece = (int)((tetris_random(monde))*NOMBRE_PIECES);
 	monde->score = 0;
 	monde->lines = 0;
-	monde->perdu = 0;
-	monde->quit = 0;
 	monde->firstDraw = 1;
+
+
+}
+
+void tetris_init_data( struct Monde *monde, struct TermData *termData){
+//ouvre le fichier /dev/random pour avoir des piece random
+	monde->random = open("/dev/random", O_RDONLY);
+
+	tetris_init_monde_data( monde);
 
 	termData->prevLINES = LINES;
 	termData->prevCOLS = COLS;
 	termData->termTropPetit = 0;
 	termData->tetrisWin = NULL;
 	termData->scoreWin = NULL;
-
 //Créer les fenetre ncurses
 	tetris_creer_fenetre(termData, 1);
 
@@ -149,8 +154,12 @@ int tetris_creer_fenetre( struct TermData *termData, int init){
 
 	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
 	wrefresh(termData->scoreWin);
-	if( ! tropPetit)
+	wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+	if( ! tropPetit){
 		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
+		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 3,posXSWin + 1 , "press p to quit!");
+		
+		}
 	return tropPetit;
 }
 

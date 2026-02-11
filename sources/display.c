@@ -13,7 +13,7 @@
 void tetris_display( struct Monde *monde, struct TermData *termData){
 	int i, j, tropPetit;
 
-	if (monde->startMenu){
+	if (monde->startMenu || monde->pause){
 // Si on est dans StartMenu
 		if (RESIZE_CHECK || monde->firstDraw){
 	//si il y a redimensionnement du terminal on redessine tout
@@ -29,13 +29,17 @@ void tetris_display( struct Monde *monde, struct TermData *termData){
 			}else{
 				termData->termTropPetit = 0;
 				//redessine les fenetre 
-				tetris_creer_fenetre( termData, 0);
 				
+				tetris_creer_fenetre( termData, 0);
 				for (i=0; i < TETRIS_WIDTH; i++){
 					for (j=0 ; j< TETRIS_HEIGHT; j++){
-						mvwprintw( termData->tetrisWin , j+1 , i*2+1 , "  ");
-						mvwprintw( termData->tetrisWin , TETRIS_HEIGHT / 2, (TETRIS_WIDTH * 2 - 11)/ 2 + 1, "press ENTER");
+						mvwprintw( termData->tetrisWin , j+1 , i*2+1 , "--");
 					}	
+				}
+				if (monde->startMenu)
+					mvwprintw( termData->tetrisWin , TETRIS_HEIGHT / 2, (TETRIS_WIDTH * 2 - 11)/ 2 + 1, "press ENTER");
+				if (monde->pause){
+					mvwprintw( termData->tetrisWin , TETRIS_HEIGHT / 2, (TETRIS_WIDTH * 2 - 5)/ 2 + 1, "Pause");
 				}
 				wrefresh(termData->tetrisWin);
 				tetris_dessine_score(monde, termData);
@@ -44,8 +48,9 @@ void tetris_display( struct Monde *monde, struct TermData *termData){
 		}else{
 	//sinon on redessine que le contenu qui change
 			RESIZE_SAVE;
+			tetris_dessine_score(monde, termData);
 		}
-	}else if(! monde->startMenu){
+	}else if(! monde->startMenu && !monde->pause){
 	// Si on est dans le jeu
 		if (RESIZE_CHECK || monde->firstDraw){
 	//si il y a redimensionnement du terminal on redessine tout
@@ -90,7 +95,6 @@ void tetris_redessine_plan(struct Monde *monde,struct TermData *termData){
 			}
 		}
 	}
-	//met au bon endroit le curseur
 	wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
 	doupdate();
 }

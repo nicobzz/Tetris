@@ -36,7 +36,8 @@ void tetris_change_monde (struct Monde *monde){
 		key = tetris_get_key( monde );
 		switch (key){
 			case 10:
-				monde->startMenu = 0;
+				monde->startMenu = 1;
+				tetris_init_monde_data( monde );
 				break;
 			case 'q':
 				monde->quit = 1;
@@ -48,13 +49,39 @@ void tetris_change_monde (struct Monde *monde){
 				monde->lastKey = TETRIS_NO_KEY ;
 				break;
 		}
+		if (monde->startMenu){
+
+
+		}
+	}else if(monde->pause == 1){
+		key = tetris_get_key( monde );
+		switch (key){
+			case 'q':
+				monde->quit = 1;
+				break;
+			case KEY_ENTER:
+			case 'p':
+				monde->pause = 0;
+				monde->firstDraw = 1;
+				break;
+			case KEY_RESIZE:
+				handle_resize();
+				break;
+			default:
+				monde->lastKey = TETRIS_NO_KEY ;
+				break;
+		}
+
 	}else{
 //si on est en jeu
 		key = tetris_get_key( monde );
 		switch (key){
 			case 'q':
-			case 'n':
 				monde->quit = 1;
+				break;
+			case 'p':
+				monde->pause = 1;
+				monde->firstDraw = 1;
 				break;
 			case KEY_ENTER:
 			case KEY_DOWN:
@@ -151,7 +178,6 @@ void tetris_change_monde (struct Monde *monde){
 				tetris_pose_piece(monde);
 			}
 		}
-
 	}
 
 }
