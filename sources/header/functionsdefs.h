@@ -5,6 +5,7 @@
 
 // tetris.c
 void clear_term ( struct TermData * termData);
+void tetris_init_monde_data( struct Monde *monde);
 void tetris_init_data( struct Monde *monde, struct TermData *termData);
 int tetris_creer_fenetre( struct TermData *termData, int init);
 void tetris_main_loop( struct Monde *monde, struct TermData *termData);

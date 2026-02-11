@@ -1,5 +1,6 @@
 #define H_STRUCT_H
-#include <ncurses.h>
+#include <locale.h>
+#include <ncursesw/ncurses.h>
 
 #define TETRIS_HEIGHT 22
 #define TETRIS_WIDTH 10
@@ -39,6 +40,10 @@ struct PosPiece {
 struct Monde {
 	int time;
 	int startMenu;
+	int score;
+	int perdu;
+	int pause;
+	int quit;
 	int plan[TETRIS_WIDTH][TETRIS_HEIGHT];	//le plan ou les pieces sont mises
 	int planColor[TETRIS_WIDTH][TETRIS_HEIGHT];	//le plan ou les couleurs sont mises
 	int niveau;
@@ -48,9 +53,6 @@ struct Monde {
 	int lastMoveTime;
 	int lastKey;
 	int lines;
-	int score;
-	int perdu;
-	int quit;
 	int random;
 	int firstDraw;
 };

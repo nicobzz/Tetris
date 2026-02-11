@@ -157,7 +157,7 @@ int tetris_creer_fenetre( struct TermData *termData, int init){
 	wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
 	if( ! tropPetit){
 		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
-		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 3,posXSWin + 1 , "press p to quit!");
+		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 3,posXSWin + 1 , "press p to pause!");
 		
 		}
 	return tropPetit;
