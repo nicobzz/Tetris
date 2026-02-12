@@ -11,8 +11,6 @@
 
 
 int main (int argc, char ** argv){
-	struct Monde monde;
-	struct TermData termData;
 	setlocale(LC_ALL, "");
 	initscr();              // Initialise la structure WINDOW et autres paramètres
 	cbreak();
@@ -21,65 +19,64 @@ int main (int argc, char ** argv){
 	keypad(stdscr, TRUE); // permet de capter le signal KEY_RESIZE dans les caractères tapés pour faire le redimensionnement du terminal
 	start_color();
 
-	tetris_init_data (&monde , &termData);
-	tetris_main_loop (&monde , &termData);
+	tetris_init_data ();
+	tetris_main_loop ();
 
 //remet bien ncurses
-	clear_term ( &termData);
+	clear_term ();
 
 //ferme le fichier random utilisé pour avoir du random pour la piece
-	if (monde.random != -1)
-		close (monde.random);
+	if (mySystem.random != -1)
+		close (mySystem.random);
 	
 	return 0;
 }
 
-void clear_term ( struct TermData * termData){
+void clear_term (){
 
-	delwin(termData->tetrisWin);
-	delwin(termData->scoreWin);
+	delwin(termData.tetrisWin);
+	delwin(termData.scoreWin);
 	endwin();               // Restaure les paramètres par défaut du terminal
 }
 
-void tetris_init_monde_data( struct Monde *monde){
+void tetris_init_world_data(){
 	int i, j;
-//initialise le monde
+//initialise le world
 	
-	monde->etat = TETRIS_START_MENU;
-	monde->time = 0;
+	world.etat = TETRIS_START_MENU;
+	world.time = 0;
 	for (i = 0; i<TETRIS_WIDTH; i++){
 		for( j = 0; j<TETRIS_HEIGHT; j++){
-			monde->plan[i][j]= 0;
-			monde->planColor[i][j]= DEFAULT_COLOR_PAIR ;
+			world.plan[i][j]= 0;
+			world.planColor[i][j]= DEFAULT_COLOR_PAIR ;
 		}
 	}
-	monde->niveau = 0;
-	monde->posPiece.index = 0;	//le numéro de la pièce actuelle
-	monde->posPiece.rot = 0;	//la rotation de la pièce actuelle (0 à 3)
-	monde->posPiece.posX = 0;
-	monde->posPiece.posY = 0;
-	monde->piecePosee = 1;
-	monde->lastMoveTime = 0;
-	monde->prochainePiece = (int)((tetris_random(monde))*NOMBRE_PIECES);
-	monde->score = 0;
-	monde->lines = 0;
-	monde->firstDraw = 1;
-
+	world.niveau = 0;
+	world.posPiece.index = 0;	//le numéro de la pièce actuelle
+	world.posPiece.rot = 0;	//la rotation de la pièce actuelle (0 à 3)
+	world.posPiece.posX = 0;
+	world.posPiece.posY = 0;
+	world.piecePosee = 1;
+	world.lastMoveTime = 0;
+	world.prochainePiece = (int)((tetris_random(world))*NOMBRE_PIECES);
+	world.score = 0;
+	world.lines = 0;
 }
 
-void tetris_init_data( struct Monde *monde, struct TermData *termData){
+void tetris_init_data(){
 //ouvre le fichier /dev/random pour avoir des piece random
-	monde->random = open("/dev/urandom", O_RDONLY);
+	mySystem.random = open("/dev/urandom", O_RDONLY);
 
-	tetris_init_monde_data(monde);
+	tetris_init_world_data(world);
 
-	termData->prevLINES = LINES;
-	termData->prevCOLS = COLS;
-	termData->termTropPetit = 0;
-	termData->tetrisWin = NULL;
-	termData->scoreWin = NULL;
+	termData.prevLINES = LINES;
+	termData.prevCOLS = COLS;
+	termData.prevEtat = TETRIS_NOWHERE ;
+	termData.termTropPetit = 0;
+	termData.tetrisWin = NULL;
+	termData.scoreWin = NULL;
 //Créer les fenetre ncurses
-	tetris_creer_fenetre(termData, 1);
+	tetris_creer_fenetre(1);
 
 //initiatise les couleurs
 	init_color( COLOR_PINK, 976, 375, 554);
@@ -96,76 +93,92 @@ void tetris_init_data( struct Monde *monde, struct TermData *termData){
 
 }
 
-int tetris_creer_fenetre( struct TermData *termData, int init){
-	int tropPetit = 0, posYSWin,  posXSWin, posYTWin, posXTWin;
+void tetris_creer_fenetre(int init){
+	int posYSWin,  posXSWin, posYTWin, posXTWin, heightTWin, widthTWin, heightSWin, widthSWin, height = 0;
 //Créer ou repositionne les fenetre ncurses
-	posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
-	posXSWin = (COLS - (TETRIS_REAL_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_WIDTH))/2 ;
+
+//Create Big size window coordonates
+	termData.size = SIZE_BIG;
+	heightSWin = TETRIS_SCORE_BIG_HEIGHT;
+	posYSWin = (LINES / 2) - ( TETRIS_SCORE_BIG_HEIGHT / 2 );
+	posXSWin = (COLS - (TETRIS_REAL_BIG_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_WIDTH))/2 ;
 	
-	posYTWin = (LINES - (TETRIS_REAL_HEIGHT ))/2 ;
-	posXTWin = posXSWin + TETRIS_SCORE_WIDTH + TETRIS_SPACE_BETWEEN ; 
+	posYTWin = (LINES - (TETRIS_REAL_BIG_HEIGHT ))/2 ;
+	posXTWin = posXSWin + TETRIS_SCORE_WIDTH + TETRIS_SPACE_BETWEEN ;
+
+	heightTWin = TETRIS_REAL_BIG_HEIGHT;
+	widthTWin = TETRIS_REAL_BIG_WIDTH;
+
+	widthSWin = TETRIS_SCORE_WIDTH;
+
+	if (posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + heightTWin > COLS || posYTWin + widthTWin > LINES){
+//if too big, create smal size window coordonates
+		termData.size = SIZE_SMALL;
+		heightSWin = TETRIS_SCORE_HEIGHT;
+		posYSWin = (LINES / 2) - ( TETRIS_SCORE_HEIGHT / 2 );
+		posXSWin = (COLS - (TETRIS_REAL_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_WIDTH))/2 ;
+		
+		posYTWin = (LINES - (TETRIS_REAL_HEIGHT ))/2 ;
+		posXTWin = posXSWin + TETRIS_SCORE_WIDTH + TETRIS_SPACE_BETWEEN ;
+
+		heightTWin = TETRIS_REAL_HEIGHT;
+		widthTWin = TETRIS_REAL_WIDTH;
 	
-	if(posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + TETRIS_REAL_WIDTH > COLS || posYTWin + TETRIS_REAL_HEIGHT > LINES){
-// si les fenetre n'ont pas la bonne taille on les mete de taille 1
-		tropPetit = 1;
-		if (init){
-//si on est dans la fonction init on crée les fenetre
-			termData->tetrisWin = subwin(stdscr, 0, 0, 1, 1);
-			termData->scoreWin = subwin(stdscr, 0, 0, 1, 1);
-		}else{
-//sinon on les redimensionne
-			werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			mvwin( termData->tetrisWin , 0, 0);
-			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			wresize( termData->tetrisWin , 1, 1);
-			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			
-			werase(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-			mvwin( termData->scoreWin , 0, 0);
-			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-			wresize( termData->scoreWin , 1, 1);
-			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-		}
-	}else{
-		if (init){
-			termData->tetrisWin = subwin(stdscr, TETRIS_REAL_HEIGHT ,TETRIS_REAL_WIDTH , posYTWin, posXTWin);
-			termData->scoreWin = subwin(stdscr, TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH, posYSWin, posXSWin);
-		}else{
-			werase(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			mvwin( termData->tetrisWin , posYTWin, posXTWin);
-			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			wresize( termData->tetrisWin , TETRIS_REAL_HEIGHT , TETRIS_REAL_WIDTH );
-			wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-			
-			werase(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-			mvwin( termData->scoreWin , posYSWin, posXSWin);
-			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-			wresize( termData->scoreWin , TETRIS_SCORE_HEIGHT, TETRIS_SCORE_WIDTH);
-			wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
+		if (posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + heightTWin > COLS || posYTWin + widthTWin > LINES){
+//if too big, create very small window coordonates
+			termData.size = SIZE_TOO_SMALL;
+			posYSWin = posXSWin = posYTWin = posXTWin = 0;
+			heightTWin = widthTWin = heightSWin = widthSWin = 1;
 		}
 	}
 
-	box(termData->tetrisWin, ACS_VLINE, ACS_HLINE);
-	wrefresh(termData->tetrisWin);
-	wnoutrefresh(termData->tetrisWin); //sert à effacer les données de fenetre en tampon
-
-	box(termData->scoreWin, ACS_VLINE, ACS_HLINE);
-	wrefresh(termData->scoreWin);
-	wnoutrefresh(termData->scoreWin); //sert à effacer les données de fenetre en tampon
-	if( ! tropPetit){
-		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
-		mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 3,posXSWin + 1 , "press p to pause!");
+//create or resize the windows according to the coordonates
+	if (init){
+		termData.tetrisWin = subwin(stdscr, heightTWin, widthTWin, posYTWin, posXTWin);
+		termData.scoreWin = subwin(stdscr, heightSWin, widthSWin, posYSWin, posXSWin);
+	}else{
+		werase(termData.tetrisWin); //sert à effacer les données de fenetre en tampon
+		mvwin( termData.tetrisWin , posYTWin, posXTWin);
+		wnoutrefresh(termData.tetrisWin); //sert à effacer les données de fenetre en tampon
+		wresize( termData.tetrisWin , heightTWin , widthTWin );
+		wnoutrefresh(termData.tetrisWin); //sert à effacer les données de fenetre en tampon
 		
+		werase(termData.scoreWin); //sert à effacer les données de fenetre en tampon
+		mvwin( termData.scoreWin , posYSWin, posXSWin);
+		wnoutrefresh(termData.scoreWin); //sert à effacer les données de fenetre en tampon
+		wresize( termData.scoreWin , heightSWin, widthSWin);
+		wnoutrefresh(termData.scoreWin); //sert à effacer les données de fenetre en tampon
+	}
+
+	box(termData.tetrisWin, ACS_VLINE, ACS_HLINE);
+	wrefresh(termData.tetrisWin);
+	wnoutrefresh(termData.tetrisWin); //sert à effacer les données de fenetre en tampon
+
+	box(termData.scoreWin, ACS_VLINE, ACS_HLINE);
+	wrefresh(termData.scoreWin);
+	wnoutrefresh(termData.scoreWin); //sert à effacer les données de fenetre en tampon
+	if( ! (termData.size == SIZE_TOO_SMALL)){
+		switch (termData.size){
+			case SIZE_SMALL:
+				height = TETRIS_SCORE_HEIGHT;break;
+			case SIZE_BIG:
+				height = TETRIS_SCORE_BIG_HEIGHT;break;
 		}
-	return tropPetit;
+		mvprintw(posYSWin + height + 2,posXSWin + 1 , "press q to quit!");
+		mvprintw(posYSWin + height + 3,posXSWin + 1 , "press p to pause!");
+	}else{
+		mvprintw ( 5,0, "error, too small terminal");
+		refresh();
+	}
+	return ;
 }
 
-void tetris_main_loop( struct Monde *monde, struct TermData *termData){
+void tetris_main_loop(){
 	while (1){
-		tetris_display( monde, termData );
+		tetris_display( world, termData );
 		tetris_millisec_sleep();
-		tetris_change_monde ( monde );
-		if (monde->etat == TETRIS_QUIT) break;
+		tetris_change_world ( world );
+		if (world.etat == TETRIS_QUIT) break;
 	}
 }
 

@@ -9,27 +9,26 @@
 #include "header/struct.h"
 #include "header/functionsdefs.h"
 
-void tetris_change_monde (struct Monde *monde){
+void tetris_change_world (){
 	int key,etat;
 	struct PosPiece posPiece;
-	monde->time++;
-	etat = monde->etat;
+	world.time++;
+	etat = world.etat;
 	switch (etat){
 		case TETRIS_START_MENU:
-			key = tetris_get_key( monde );
+			key = tetris_get_key( world );
 			switch (key){
 				case 10:
-					monde->etat = TETRIS_GAME;
-					monde->firstDraw = 1;
+					world.etat = TETRIS_GAME;
 					break;
 				case 'q':
-					monde->etat = TETRIS_QUIT;
+					world.etat = TETRIS_QUIT;
 					break;
 				case KEY_RESIZE:
 					handle_resize();
 					break;
 				default:
-					monde->lastKey = TETRIS_NO_KEY ;
+					world.lastKey = TETRIS_NO_KEY ;
 					break;
 			}
 			break;
@@ -37,147 +36,145 @@ void tetris_change_monde (struct Monde *monde){
 			break;
 // quitte le if et else if
 		case TETRIS_PERDU:
-			key = tetris_get_key( monde );
+			key = tetris_get_key( world );
 			switch (key){
 				case 10:
-					monde->etat = TETRIS_START_MENU;
-					tetris_init_monde_data( monde );
+					world.etat = TETRIS_START_MENU;
+					tetris_init_world_data( world );
 					break;
 				case 'q':
-					monde->etat = TETRIS_QUIT;
+					world.etat = TETRIS_QUIT;
 					break;
 				case KEY_RESIZE:
 					handle_resize();
 					break;
 				default:
-					monde->lastKey = TETRIS_NO_KEY ;
+					world.lastKey = TETRIS_NO_KEY ;
 					break;
 			}
 			break;
 		case TETRIS_PAUSE:
-			key = tetris_get_key( monde );
+			key = tetris_get_key( world );
 			switch (key){
 				case 'q':
-					monde->etat = TETRIS_QUIT;
+					world.etat = TETRIS_QUIT;
 					break;
-				case KEY_ENTER:
+				case 10:
 				case 'p':
-					monde->etat = TETRIS_GAME;
-					monde->firstDraw = 1;
+					world.etat = TETRIS_GAME;
 					break;
 				case KEY_RESIZE:
 					handle_resize();
 					break;
 				default:
-					monde->lastKey = TETRIS_NO_KEY ;
+					world.lastKey = TETRIS_NO_KEY ;
 					break;
 			}
 		break;
 		case TETRIS_GAME:
 //si on est en jeu
-			key = tetris_get_key( monde );
+			key = tetris_get_key( world );
 			switch (key){
 				case 'q':
-					monde->etat = TETRIS_QUIT;
+					world.etat = TETRIS_QUIT;
 					break;
 				case 'p':
-					monde->etat = TETRIS_PAUSE;
-					monde->firstDraw = 1;
+					world.etat = TETRIS_PAUSE;
 					break;
 				case KEY_ENTER:
 				case KEY_DOWN:
-					monde->lastKey = TETRIS_DOWN ;
+					world.lastKey = TETRIS_DOWN ;
 					break;
 				case KEY_UP:
 				case ' ':
-					monde->lastKey = TETRIS_ROTATE ;
+					world.lastKey = TETRIS_ROTATE ;
 					break;
 				case KEY_LEFT:
-					monde->lastKey = TETRIS_LEFT ;
+					world.lastKey = TETRIS_LEFT ;
 					break;
 				case KEY_RIGHT:
-					monde->lastKey = TETRIS_RIGHT ;
+					world.lastKey = TETRIS_RIGHT ;
 					break;
 				case KEY_RESIZE:
 					handle_resize();
 					break;
 				default:
-					monde->lastKey = TETRIS_NO_KEY ;
+					world.lastKey = TETRIS_NO_KEY ;
 					break;
 			}
-			if (monde->piecePosee){
+			if (world.piecePosee){
 	//verifie qu'une ligne n'est pas à éliminer
-				tetris_nettoie_ligne_complete(monde);
+				tetris_nettoie_ligne_complete(world);
 	//met une nouvelle pièce dans le plan en haut si la précedente pice vient d'être posée
 
-				monde->lastMoveTime = monde->time;
-				monde->posPiece.index = monde->prochainePiece ;
-				monde->posPiece.rot = 0;
-				monde->posPiece.posX = (TETRIS_WIDTH /2) - 2;
-				monde->posPiece.posY = 0;
+				world.lastMoveTime = world.time;
+				world.posPiece.index = world.prochainePiece ;
+				world.posPiece.rot = 0;
+				world.posPiece.posX = (TETRIS_WIDTH /2) - 2;
+				world.posPiece.posY = 0;
 		
-				monde->prochainePiece = (int)((tetris_random(monde))*NOMBRE_PIECES);
+				world.prochainePiece = (int)((tetris_random(world))*NOMBRE_PIECES);
 
 
 				//vérifie qu'elle peut aller sur la case et une case en dessous et pose la pièce
-				memcpy ((void *)&posPiece,(void *) &(monde->posPiece), sizeof (struct PosPiece));
-				if (tetris_verifie_place_piece(monde, &posPiece))
-					monde->etat = TETRIS_PERDU;
+				memcpy ((void *)&posPiece,(void *) &(world.posPiece), sizeof (struct PosPiece));
+				if (tetris_verifie_place_piece(&posPiece))
+					world.etat = TETRIS_PERDU;
 				posPiece.posY++;
-				if( (monde->etat == TETRIS_PERDU)?1:tetris_verifie_place_piece(monde, &posPiece))
-					monde->etat = TETRIS_PERDU;
-				if (! (monde->etat == TETRIS_PERDU)){
-					tetris_pose_piece(monde);
+				if( (world.etat == TETRIS_PERDU)?1:tetris_verifie_place_piece(&posPiece))
+					world.etat = TETRIS_PERDU;
+				if (! (world.etat == TETRIS_PERDU)){
+					tetris_pose_piece(world);
 				}
-				monde->piecePosee = 0;
+				world.piecePosee = 0;
 
-			}else if ( ((monde->lastKey == TETRIS_DOWN) && ((monde->time - monde->lastMoveTime ) > MAX_SPEED )) ||
-					((monde->time - monde->lastMoveTime ) > vitesseNiveau[monde->niveau]) ){
+			}else if ( ((world.lastKey == TETRIS_DOWN) && ((world.time - world.lastMoveTime ) > MAX_SPEED )) ||
+					((world.time - world.lastMoveTime ) > vitesseNiveau[world.niveau]) ){
 	//deplace le bloc d'une case vers le bas
 	//soit le temps de mouvement est dépassé, soit on a appuyé sur la touche bas et le laps de temps rapide est dépassé
-				monde->lastMoveTime = monde->time;
-				tetris_efface_piece(monde);
+				world.lastMoveTime = world.time;
+				tetris_efface_piece(world);
 
-				memcpy ((void *)&posPiece,(void *) &(monde->posPiece), sizeof (struct PosPiece));
+				memcpy ((void *)&posPiece,(void *) &(world.posPiece), sizeof (struct PosPiece));
 				posPiece.posY++;
-				if( tetris_verifie_place_piece(monde, &posPiece)){
+				if( tetris_verifie_place_piece(&posPiece)){
 				//Si la piece ne peut pas descendre
-					monde->piecePosee = 1;
-					tetris_pose_piece(monde);
+					world.piecePosee = 1;
+					tetris_pose_piece(world);
 				}else{
-					monde->posPiece.posY++;
-					tetris_pose_piece(monde);
+					world.posPiece.posY++;
+					tetris_pose_piece(world);
 				}
-			}else if (monde->lastKey == TETRIS_LEFT || monde->lastKey == TETRIS_RIGHT){
+			}else if (world.lastKey == TETRIS_LEFT || world.lastKey == TETRIS_RIGHT){
 				//il y a un soucis, c'est qu'il faut pouvoir mettre une piece en dessous et à G ou à D en meme temps dans certains cas pour débloquer certaines situations
 			
-				tetris_efface_piece(monde);
+				tetris_efface_piece(world);
 
-				memcpy ((void *)&posPiece,(void *) &(monde->posPiece), sizeof (struct PosPiece));
-				if (monde->lastKey == TETRIS_LEFT)
+				memcpy ((void *)&posPiece,(void *) &(world.posPiece), sizeof (struct PosPiece));
+				if (world.lastKey == TETRIS_LEFT)
 					posPiece.posX--;
-				if (monde->lastKey == TETRIS_RIGHT)
+				if (world.lastKey == TETRIS_RIGHT)
 					posPiece.posX++;
-				if( tetris_verifie_place_piece(monde, &posPiece)){
+				if( tetris_verifie_place_piece(&posPiece)){
 				//Si la piece ne peut pas aller à gauche ou à droite, on la remet la ou elle est 
-					tetris_pose_piece(monde);
+					tetris_pose_piece(world);
 				}else{
-					monde->posPiece.posX= posPiece.posX;
-					tetris_pose_piece(monde);
+					world.posPiece.posX= posPiece.posX;
+					tetris_pose_piece(world);
 				}
-			}else if (monde->lastKey == TETRIS_ROTATE){
-				tetris_efface_piece(monde);
+			}else if (world.lastKey == TETRIS_ROTATE){
+				tetris_efface_piece(world);
 
-				memcpy ((void *)&posPiece,(void *) &(monde->posPiece), sizeof (struct PosPiece));
+				memcpy ((void *)&posPiece,(void *) &(world.posPiece), sizeof (struct PosPiece));
 				posPiece.rot--;
 				if (posPiece.rot < 0)
 					posPiece.rot = 3;
-				if( tetris_verifie_place_piece(monde, &posPiece)){
+				if( tetris_verifie_place_piece(&posPiece)){
 				//Si la piece ne peut pas aller à gauche ou à droite, on la remet la ou elle est 
-					tetris_pose_piece(monde);
+					tetris_pose_piece(world);
 				}else{
-					monde->posPiece.rot= posPiece.rot;
-					tetris_pose_piece(monde);
+					world.posPiece.rot= posPiece.rot;
+					tetris_pose_piece(world);
 				}
 			}
 			break;
@@ -186,7 +183,7 @@ void tetris_change_monde (struct Monde *monde){
 }
 
 
-int tetris_get_key (struct Monde *monde){
+int tetris_get_key (){
 
 	int ch;
 
@@ -212,13 +209,13 @@ int tetris_millisec_sleep(){
 }
 
 
-int tetris_verifie_place_piece(struct Monde *monde, struct PosPiece *posPiece ){
+int tetris_verifie_place_piece(struct PosPiece *posPiece ){
 //verifie que la piece peut être positionnée 
 	int i, j, pris = TETRIS_LIBRE, pt_piece, pt_plan;
 	for( i = 0 ; i < 4 ; i++){
 		for ( j = 0 ; j < 4 ; j++){
 			pt_piece = pieces[posPiece->index][posPiece->rot][i][j];
-			pt_plan = monde->plan[posPiece->posX+i][posPiece->posY+j];
+			pt_plan = world.plan[posPiece->posX+i][posPiece->posY+j];
 
 			if (pt_piece != 0){
 				if (pt_plan || ( (posPiece->posY + j) >= TETRIS_HEIGHT ) )
@@ -231,20 +228,20 @@ int tetris_verifie_place_piece(struct Monde *monde, struct PosPiece *posPiece ){
 	return pris;
 }
 
-int tetris_pose_piece(struct Monde *monde){
+int tetris_pose_piece(){
 //place la pièce
 	int i, j, posee = 0, pt_piece, pt_plan, indexPiece;
 	for( i = 0 ; i < 4 ; i++){
 		for ( j = 0 ; j < 4 ; j++){
-			pt_piece = pieces[monde->posPiece.index][monde->posPiece.rot][i][j];
-			pt_plan = monde->plan[monde->posPiece.posX+i][monde->posPiece.posY+j];
+			pt_piece = pieces[world.posPiece.index][world.posPiece.rot][i][j];
+			pt_plan = world.plan[world.posPiece.posX+i][world.posPiece.posY+j];
 
 			if (pt_piece != 0){
 				if(pt_plan !=0)
 					posee = 1;
-				indexPiece = monde->posPiece.index;
-				monde->plan[monde->posPiece.posX+i][monde->posPiece.posY+j] = indexPiece + 1 ;
-				monde->planColor[monde->posPiece.posX+i][monde->posPiece.posY+j] = indexPiece + 1;
+				indexPiece = world.posPiece.index;
+				world.plan[world.posPiece.posX+i][world.posPiece.posY+j] = indexPiece + 1 ;
+				world.planColor[world.posPiece.posX+i][world.posPiece.posY+j] = indexPiece + 1;
 			}
 		}
 	}
@@ -252,22 +249,22 @@ int tetris_pose_piece(struct Monde *monde){
 }
 
 
-void tetris_efface_piece(struct Monde *monde){
+void tetris_efface_piece(){
 //efface la piece de sa position précédente
 	int i, j, pt_piece;
 	for( i = 0 ; i < 4 ; i++){
 		for ( j = 0 ; j < 4 ; j++){
-			pt_piece = pieces[monde->posPiece.index][monde->posPiece.rot][i][j];
+			pt_piece = pieces[world.posPiece.index][world.posPiece.rot][i][j];
 
 			if (pt_piece != 0){
-				monde->plan[monde->posPiece.posX+i][monde->posPiece.posY+j] = 0;
-				monde->planColor[monde->posPiece.posX+i][monde->posPiece.posY+j] = DEFAULT_COLOR_PAIR ;
+				world.plan[world.posPiece.posX+i][world.posPiece.posY+j] = 0;
+				world.planColor[world.posPiece.posX+i][world.posPiece.posY+j] = DEFAULT_COLOR_PAIR ;
 			}
 		}
 	}
 }
 
-void handle_resize(void){
+void handle_resize(){
 
 	resizeterm(0, 0);     // synchronise ncurses
 
@@ -280,30 +277,30 @@ void handle_resize(void){
 
 
 //verifie qu'une ligne n'est pas à éliminer
-void tetris_nettoie_ligne_complete(struct Monde *monde){
+void tetris_nettoie_ligne_complete(){
 	int i=0, j=0, k=0, l=0, complet;
 	for (i = TETRIS_HEIGHT -1; i >= 0 ; (complet)?i:i--){
 		//refresh();
 		complet = 1;
 		for (j = 0 ; j < TETRIS_WIDTH ; j++){
-			if (monde->plan[j][i] == 0)
+			if (world.plan[j][i] == 0)
 				complet = 0;
 		}
 		if (complet){
-			monde->lines++;
-			monde->niveau = monde->lines / LIGNES_PAR_NIVEAU;
-			if (monde->niveau >= NIVEAU_MAX)
-				monde->niveau = NIVEAU_MAX-1;
+			world.lines++;
+			world.niveau = world.lines / LIGNES_PAR_NIVEAU;
+			if (world.niveau >= NIVEAU_MAX)
+				world.niveau = NIVEAU_MAX-1;
 			for (k = i ; k >= 1 ; k--){
 				for (l = 0 ; l < TETRIS_WIDTH ; l++){
-					monde->plan[l][k]=monde->plan[l][k-1];
-					monde->planColor[l][k]=monde->planColor[l][k-1];
+					world.plan[l][k]=world.plan[l][k-1];
+					world.planColor[l][k]=world.planColor[l][k-1];
 					
 				}
 			}
 			for (l = 0 ; l < TETRIS_WIDTH ; l++){
-				monde->plan[l][0]=0;
-				monde->planColor[l][0]=DEFAULT_COLOR_PAIR;
+				world.plan[l][0]=0;
+				world.planColor[l][0]=DEFAULT_COLOR_PAIR;
 			}
 		}
 	}

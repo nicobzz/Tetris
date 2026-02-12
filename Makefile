@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g
 SOURCESDIR = sources
-SOURCESFILES = tetris.c pieces.c display.c niveaux.c change_monde.c random.c
+SOURCESFILES = tetris.c pieces.c display.c niveaux.c change_monde.c random.c main_structs.c
 SOURCES = $(addprefix $(SOURCESDIR)/, $(SOURCESFILES))
 HEADERSDIR = sources/headers
 HEADERSFILES = struc.h functionsdefs.h 

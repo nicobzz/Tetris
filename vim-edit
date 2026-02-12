@@ -1,4 +1,4 @@
 #!/bin/bash
 
-vim Makefile sources/tetris.c sources/display.c sources/change_monde.c sources/pieces.c sources/niveaux.c sources/random.c sources/header/functionsdefs.h sources/header/struct.h edit
+vim Makefile sources/tetris.c sources/display.c sources/change_monde.c sources/pieces.c sources/niveaux.c sources/main_structs.c sources/random.c sources/header/functionsdefs.h sources/header/struct.h vim-edit
 

@@ -4,27 +4,27 @@
 
 
 // tetris.c
-void clear_term ( struct TermData * termData);
-void tetris_init_monde_data( struct Monde *monde);
-void tetris_init_data( struct Monde *monde, struct TermData *termData);
-int tetris_creer_fenetre( struct TermData *termData, int init);
-void tetris_main_loop( struct Monde *monde, struct TermData *termData);
+void clear_term ();
+void tetris_init_world_data();
+void tetris_init_data();
+void tetris_creer_fenetre(int init);
+void tetris_main_loop();
 
-//change_monde.c
-void tetris_change_monde (struct Monde *monde);
-int tetris_get_key (struct Monde *monde);
+//change_world.c
+void tetris_change_world ();
+int tetris_get_key ();
 int tetris_millisec_sleep();
-int tetris_verifie_place_piece(struct Monde *monde, struct PosPiece *piece );
-int tetris_pose_piece(struct Monde *monde);
-void tetris_efface_piece(struct Monde *monde);
-void handle_resize(void);
-void tetris_nettoie_ligne_complete(struct Monde *monde);
-
+int tetris_verifie_place_piece( struct PosPiece *piece );
+int tetris_pose_piece();
+void tetris_efface_piece();
+void handle_resize();
+void tetris_nettoie_ligne_complete();
 
 //display.c
-void tetris_display( struct Monde *monde, struct TermData *termData);
-void tetris_redessine_plan(struct Monde *monde,struct TermData *termData);
-void tetris_dessine_score(struct Monde *monde,struct TermData *termData);
+void tetris_display();
+void tetris_redessine_plan();
+void tetris_dessine_score();
+void print_piece_point_score_win( int i , int j);
 
 //random.c
-double tetris_random(struct Monde *monde);
+double tetris_random();

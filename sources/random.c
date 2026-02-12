@@ -6,14 +6,14 @@
 #include "header/struct.h"
 #include "header/functionsdefs.h"
 
-double tetris_random (struct Monde *monde){
+double tetris_random (){
 	char buffer [2];
 	ssize_t n;
 	int erreur = 0,i;
 	unsigned long randomint = 0;
-	double ret= 0;
-	if (monde->random != -1){
-		n = read (monde->random, buffer, sizeof(buffer) );
+	double ret = 0;
+	if (mySystem.random != -1){
+		n = read (mySystem.random, buffer, sizeof(buffer) );
 		if (n != 2){
 			erreur = 1;
 		}else{
