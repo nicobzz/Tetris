@@ -5,3 +5,4 @@ Tetris
 ./sources/pieces.o
 ./sources/random.o
 ./sources/tetris.o
+./sources/main_structs.o
