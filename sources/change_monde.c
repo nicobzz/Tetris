@@ -159,7 +159,7 @@ void tetris_change_world (){
 				//Si la piece ne peut pas aller à gauche ou à droite, on la remet la ou elle est 
 					tetris_pose_piece(world);
 				}else{
-					world.posPiece.posX= posPiece.posX;
+					world.posPiece.posX = posPiece.posX;
 					tetris_pose_piece(world);
 				}
 			}else if (world.lastKey == TETRIS_ROTATE){
@@ -173,7 +173,7 @@ void tetris_change_world (){
 				//Si la piece ne peut pas aller à gauche ou à droite, on la remet la ou elle est 
 					tetris_pose_piece(world);
 				}else{
-					world.posPiece.rot= posPiece.rot;
+					world.posPiece.rot = posPiece.rot;
 					tetris_pose_piece(world);
 				}
 			}

@@ -94,22 +94,22 @@ void tetris_init_data(){
 }
 
 void tetris_creer_fenetre(int init){
-	int posYSWin,  posXSWin, posYTWin, posXTWin, heightTWin, widthTWin, heightSWin, widthSWin, height = 0;
+	int posYSWin,  posXSWin, posYTWin, posXTWin, heightTWin, widthTWin, heightSWin, widthSWin;
 //Créer ou repositionne les fenetre ncurses
 
 //Create Big size window coordonates
 	termData.size = SIZE_BIG;
 	heightSWin = TETRIS_SCORE_BIG_HEIGHT;
 	posYSWin = (LINES / 2) - ( TETRIS_SCORE_BIG_HEIGHT / 2 );
-	posXSWin = (COLS - (TETRIS_REAL_BIG_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_WIDTH))/2 ;
+	posXSWin = (COLS - (TETRIS_REAL_BIG_WIDTH + TETRIS_SPACE_BETWEEN + TETRIS_SCORE_BIG_WIDTH))/2 ;
 	
 	posYTWin = (LINES - (TETRIS_REAL_BIG_HEIGHT ))/2 ;
-	posXTWin = posXSWin + TETRIS_SCORE_WIDTH + TETRIS_SPACE_BETWEEN ;
+	posXTWin = posXSWin + TETRIS_SCORE_BIG_WIDTH + TETRIS_SPACE_BETWEEN ;
 
 	heightTWin = TETRIS_REAL_BIG_HEIGHT;
 	widthTWin = TETRIS_REAL_BIG_WIDTH;
 
-	widthSWin = TETRIS_SCORE_WIDTH;
+	widthSWin = TETRIS_SCORE_BIG_WIDTH;
 
 	if (posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + heightTWin > COLS || posYTWin + widthTWin > LINES){
 //if too big, create smal size window coordonates
@@ -123,6 +123,8 @@ void tetris_creer_fenetre(int init){
 
 		heightTWin = TETRIS_REAL_HEIGHT;
 		widthTWin = TETRIS_REAL_WIDTH;
+
+		widthSWin = TETRIS_SCORE_WIDTH;
 	
 		if (posYSWin < 0 || posXSWin <0 || posYTWin <0 ||posXTWin + heightTWin > COLS || posYTWin + widthTWin > LINES){
 //if too big, create very small window coordonates
@@ -158,14 +160,13 @@ void tetris_creer_fenetre(int init){
 	wrefresh(termData.scoreWin);
 	wnoutrefresh(termData.scoreWin); //sert à effacer les données de fenetre en tampon
 	if( ! (termData.size == SIZE_TOO_SMALL)){
-		switch (termData.size){
-			case SIZE_SMALL:
-				height = TETRIS_SCORE_HEIGHT;break;
-			case SIZE_BIG:
-				height = TETRIS_SCORE_BIG_HEIGHT;break;
+		if (termData.size == SIZE_SMALL){
+			mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
+			mvprintw(posYSWin + TETRIS_SCORE_HEIGHT + 3,posXSWin + 1 , "press p to pause!");
+		}else{
+			mvprintw(posYSWin + TETRIS_SCORE_BIG_HEIGHT + 2,posXSWin + 1 , "press q to quit!");
+			mvprintw(posYSWin + TETRIS_SCORE_BIG_HEIGHT + 3,posXSWin + 1 , "press p to pause!");
 		}
-		mvprintw(posYSWin + height + 2,posXSWin + 1 , "press q to quit!");
-		mvprintw(posYSWin + height + 3,posXSWin + 1 , "press p to pause!");
 	}else{
 		mvprintw ( 5,0, "error, too small terminal");
 		refresh();

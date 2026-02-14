@@ -1,3 +1,4 @@
+![Tetris Game](images/illustration.png)
 
 it's a tetris clone, made for linux terminal, 
 

@@ -15,7 +15,7 @@ void tetris_display(){
 	etat = world.etat;
 	//check if screen has been resized
 	resizeCheck = RESIZE_CHECK;
-	RESIZE_SAVE;
+/bin/bash: ligne 1: 4 : commande introuvable
 	
 	switch (etat){
 		case TETRIS_START_MENU:
@@ -153,7 +153,7 @@ void tetris_dessine_score(){
 		default:
 			mvwprintw ( termData.scoreWin, 4, 2, "next:    ");
 			wattron(termData.scoreWin,COLOR_PAIR( world.prochainePiece+1));
-			for (i=0; i<3; i++){
+			for (i=0; i<4; i++){
 				for (j=0; j<4; j++){
 					c = pieces[world.prochainePiece][0][i][j];
 					if (c){
@@ -169,8 +169,11 @@ void tetris_dessine_score(){
 			}
 			break;
 	}
-	
-	mvwprintw( termData.scoreWin, 11, 19, " ");
+	if (termData.size == SIZE_SMALL){
+		mvwprintw( termData.scoreWin, TETRIS_SCORE_HEIGHT -1, TETRIS_SCORE_WIDTH-1 , " ");
+	}else if(termData.size == SIZE_BIG){
+		mvwprintw( termData.scoreWin, TETRIS_SCORE_BIG_HEIGHT-1 , TETRIS_SCORE_BIG_WIDTH -1 , " ");
+	}
 	wrefresh(termData.scoreWin);
 }
 
@@ -179,8 +182,8 @@ void print_piece_point_score_win( int i , int j){
 	if (termData.size == SIZE_SMALL){
 		mvwprintw( termData.scoreWin, 6+j , 8+i*2, "  ");
 	}else if(termData.size == SIZE_BIG){
-		mvwprintw( termData.scoreWin, 6+j*2 , 4+i*4, "    ");
-		mvwprintw( termData.scoreWin, 6+j*2 +1 , 4+i*4, "    ");
+		mvwprintw( termData.scoreWin, 6+j*2 , 6+i*4, "    ");
+		mvwprintw( termData.scoreWin, 6+j*2 +1 , 6+i*4, "    ");
 	}
 
 }
